@@ -1,11 +1,11 @@
 import payload from 'payload'
-import config from '../payload.config' // ✅ Path is correct since both are in /src
+import config from '@/payload.config'
 
 let isInitialized = false
 
 export const getPayloadClient = async () => {
   if (!isInitialized) {
-    await payload.init({ config }) // ✅ Initialize using actual config object
+    await payload.init({ config })
     isInitialized = true
   }
   return payload
