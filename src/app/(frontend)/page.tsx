@@ -1,19 +1,27 @@
-import { headers as getHeaders } from 'next/headers.js'
-import Image from 'next/image'
-import { getPayload } from 'payload'
-import React from 'react'
-import { fileURLToPath } from 'url'
+'use client'
 
-import config from '@/payload.config'
+import Image from 'next/image'
+import { useEffect, useState } from 'react'
 import './styles.css'
 
-export default async function HomePage() {
-  const headers = await getHeaders()
-  const payloadConfig = await config
-  const payload = await getPayload({ config: payloadConfig })
-  const { user } = await payload.auth({ headers })
+export default function HomePage() {
+  const [userEmail, setUserEmail] = useState<string | null>(null)
 
-  const fileURL = `vscode://file/${fileURLToPath(import.meta.url)}`
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch('/api/users/me')
+        const data = await res.json()
+        if (res.ok && data?.user?.email) {
+          setUserEmail(data.user.email)
+        }
+      } catch (err) {
+        console.error('Error fetching user:', err)
+      }
+    }
+
+    fetchUser()
+  }, [])
 
   return (
     <div className="home">
@@ -27,12 +35,13 @@ export default async function HomePage() {
             width={65}
           />
         </picture>
-        {!user && <h1>Welcome to your new project.</h1>}
-        {user && <h1>Welcome back, {user.email}</h1>}
+        {!userEmail && <h1>Welcome to your new project.</h1>}
+        {userEmail && <h1>Welcome back, {userEmail}</h1>}
+
         <div className="links">
           <a
             className="admin"
-            href={payloadConfig.routes.admin}
+            href="/admin" // static path to admin panel
             rel="noopener noreferrer"
             target="_blank"
           >
@@ -48,9 +57,13 @@ export default async function HomePage() {
           </a>
         </div>
       </div>
+
       <div className="footer">
         <p>Update this page by editing</p>
-        <a className="codeLink" href={fileURL}>
+        <a
+          className="codeLink"
+          href="vscode://file/src/app/(frontend)/page.tsx"
+        >
           <code>app/(frontend)/page.tsx</code>
         </a>
       </div>

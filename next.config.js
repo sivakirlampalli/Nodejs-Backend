@@ -2,9 +2,8 @@ import { withPayload } from '@payloadcms/next/withPayload'
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ['payload'],
   experimental: {
-    serverActions: true,
+    serverActions: {}, // ✅ Fixed invalid boolean
   },
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {
